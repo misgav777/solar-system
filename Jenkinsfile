@@ -12,6 +12,7 @@ pipeline {
                 sh 'npm install --no-audit'
             }
         }
+
         stage('Scanning dependencies') {
             parallel {
                 stage('NPM dependencies Audit') {
@@ -45,6 +46,14 @@ pipeline {
                     sh 'npm test'
                 }
                 junit allowEmptyResults: true, keepProperties: true, stdioRetention: '', testResults: 'test-results.xml'
+            }
+        }
+
+        stage('Code coverage') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'mongodb-credentials', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+                    sh 'npm run coverage'
+                }
             }
         }
     }

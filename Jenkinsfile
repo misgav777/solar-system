@@ -9,7 +9,6 @@ pipeline {
                 sh 'npm install --no-audit'
             }
         }
-
         stage('Scanning dependencies') {
             parallel {
                 stage('NPM dependencies Audit') {

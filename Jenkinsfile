@@ -3,6 +3,9 @@ pipeline {
     tools {
         nodejs '23.7.0'
     }
+    environment {
+        MONGO_URI = "mongodb+srv://supercluster.d83jj.mongodb.net/superData"
+    }
     stages {
         stage('installing dependencies') {
             steps {
@@ -17,7 +20,7 @@ pipeline {
                         sh 'echo $?' // print the exit code
                     }
                 }
-
+ 
                 stage('OWASP Dependency-Check') {
                     steps {
                         dependencyCheck additionalArguments: '''
@@ -33,6 +36,15 @@ pipeline {
                         reportName: 'Dependency HTML Report', reportTitles: '', useWrapperFileDirectly: true])
                     }    
                 }
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'mongodb-credentials', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
+                    sh 'npm test'
+                }
+                junit allowEmptyResults: true, keepProperties: true, stdioRetention: '', testResults: 'test-results.xml'
             }
         }
     }

@@ -25,7 +25,7 @@ pipeline {
                     --out \'./\'
                     --prettyPrint
                 ''', odcInstallation: 'OWASP-Dependency-Check-10'
-                
+            }    
         }
     }
 }

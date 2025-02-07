@@ -9,23 +9,27 @@ pipeline {
                 sh 'npm install --no-audit'
             }
         }
-        
-        stage('NPM dependencies Audit') {
-            steps {
-                sh 'npm audit --audit-level=critical'
-                sh 'echo $?' // print the exit code
-            }
-        }
 
-        stage('OWASP Dependency-Check') {
-            steps {
-                dependencyCheck additionalArguments: '''
-                    --scan \'./\'
-                    --format \'ALL\'
-                    --out \'./\'
-                    --prettyPrint
-                ''', odcInstallation: 'OWASP-Dependency-Check-10'
-            }    
+        stage('Scanning dependencies') {
+            parallel {
+                stage('NPM dependencies Audit') {
+                    steps {
+                        sh 'npm audit --audit-level=critical'
+                        sh 'echo $?' // print the exit code
+                    }
+                }
+
+                stage('OWASP Dependency-Check') {
+                    steps {
+                        dependencyCheck additionalArguments: '''
+                            --scan \'./\'
+                            --format \'ALL\'
+                            --out \'./\'
+                            --prettyPrint
+                        ''', odcInstallation: 'OWASP-Dependency-Check-10'
+                    }    
+                }
+            }
         }
     }
 }

@@ -7,7 +7,6 @@ pipeline {
         stage('test-nodejs') {
             steps {
                 sh '''
-                echo "Testing NodeJS"
                 node --version
                 npm --version
                 '''

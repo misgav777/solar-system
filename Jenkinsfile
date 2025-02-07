@@ -26,6 +26,9 @@ pipeline {
                             --out \'./\'
                             --prettyPrint
                         ''', odcInstallation: 'OWASP-Dependency-Check-10'
+
+                        junit allowEmptyResults: true, keepProperties: true, stdioRetention: '', testResults: 'dependency-check-junit.xml'
+
                         publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', 
                         reportName: 'Dependency HTML Report', reportTitles: '', useWrapperFileDirectly: true])
                     }    

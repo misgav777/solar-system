@@ -4,12 +4,9 @@ pipeline {
         nodejs '23.7.0'
     }
     stages {
-        stage('test-nodejs') {
+        stage('installing dependencies') {
             steps {
-                sh '''
-                node --version
-                npm --version
-                '''
+                sh 'npm install --no-audit'
             }
         }
     }

@@ -5,8 +5,8 @@ pipeline {
     }
     environment {
         MONGO_URI = "mongodb+srv://supercluster.d83jj.mongodb.net/superData"
-        MONGO_USERNAME = credentials('mongodb-credentials').username
-        MONGO_PASSWORD = credentials('mongodb-credentials').password
+        MONGO_USERNAME = credentials('mongodb-user')
+        MONGO_PASSWORD = credentials('mongodb-password')
     }
     stages {
         stage('installing dependencies') {

@@ -52,8 +52,26 @@ pipeline {
 
         stage('Build docker image') {
             steps {
-                sh 'printenv'
+                // sh 'printenv'
                 sh 'docker build -t solar:$GIT_COMMIT .'
+            }
+        }
+
+        stage('Trivy vulnerability scan') {
+            steps {
+                sh '''
+                trivy image solar:$GIT_COMMIT
+                --severity LOW,MEDIUM,HIGH \
+                --exit-code 0 \
+                --quiet \ 
+                --format json -o trivy-MEDIUM-report.json 
+
+                trivy image solar:$GIT_COMMIT
+                --severity CRITICAL \
+                --exit-code 1 \
+                --quiet \
+                --format json -o trivy-CRITICAL-report.json
+                '''
             }
         }
     }

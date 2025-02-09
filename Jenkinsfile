@@ -69,7 +69,7 @@ pipeline {
             }
             post {
                 always {
-                    '''
+                    sh '''
                         trivy convert \
                             --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
                             --output trivy-MEDIUM-report.html trivy-MEDIUM-report.json
@@ -82,7 +82,7 @@ pipeline {
                         trivy convert \
                             --format template --template "@/usr/local/share/trivy/templates/junit.tpl" \
                             --output trivy-CRITICAL-report.xml trivy-CRITICAL-report.json
-                        '''
+                    '''
                 }
             }
         }

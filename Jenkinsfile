@@ -49,6 +49,13 @@ pipeline {
                 }                
             }
         }
+
+        stage('Build docker image') {
+            steps {
+                SH 'printenv'
+                sh 'docker build -t solar:$GIT_COMMIT .'
+            }
+        }
     }
 
     post {

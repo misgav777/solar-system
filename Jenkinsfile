@@ -59,19 +59,19 @@ pipeline {
 
         stage('Trivy vulnerability scan') {
             steps {
-                sh '''
-                trivy image solar:$GIT_COMMIT
+                sh """
+                trivy image solar:${GIT_COMMIT} \
                 --severity LOW,MEDIUM,HIGH \
                 --exit-code 0 \
                 --quiet \ 
                 --format json -o trivy-MEDIUM-report.json 
 
-                trivy image solar:$GIT_COMMIT
+                trivy image solar:${GIT_COMMIT} \
                 --severity CRITICAL \
                 --exit-code 1 \
                 --quiet \
                 --format json -o trivy-CRITICAL-report.json
-                '''
+                """
             }
         }
     }

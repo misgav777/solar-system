@@ -118,12 +118,12 @@ pipeline {
                     sshagent(['private-key-aws']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no ubuntu@13.126.192.17
-                            if sudo docker ps | grep -q ${ECR_REPO}; then
+                            if docker ps | grep -q ${ECR_REPO}; then
                                 echo "Container is running, stopping and removing it"
-                                sudo docker stop ${ECR_REPO} && sudo docker rm ${ECR_REPO}
+                                docker stop ${ECR_REPO} && docker rm ${ECR_REPO}
                                 echo "Container stopped and removed"
                         fi
-                            sudo docker run --name ${ECR_REPO} \
+                            docker run --name ${ECR_REPO} \
                                 -e MONGO_URI=${MONGO_URI} \
                                 -e MONGO_USERNAME=${MONGO_USERNAME} \
                                 -e MONGO_PASSWORD=${MONGO_PASSWORD} \

@@ -64,8 +64,7 @@ pipeline {
         stage('Build docker image') {
             steps {
                 // sh 'printenv'
-                def imageName = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${GIT_COMMIT}"
-                sh 'docker build -t ${imageName} .'
+                sh "docker build -t ${FULL_IMAGE_NAME}:${GIT_COMMIT} ."
             }
         }
 
@@ -101,9 +100,10 @@ pipeline {
 
         stage('Push docker image to ECR') {
             steps {
-                def imageName = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${GIT_COMMIT}"
-                sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-                sh "docker push ${imageName}"
+                sh '''
+                aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                docker push ${FULL_IMAGE_NAME}:${GIT_COMMIT}
+                '''
             }
         }
     }

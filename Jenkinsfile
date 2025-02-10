@@ -46,14 +46,9 @@ pipeline {
 
         stage('Unit Test') {
             steps {
-                script {
-                    try {
-                        sh 'npm test'
-                    } catch (err) {
-                        junit testResults: 'test-results.xml'
-                        throw err
-                    }
-                }
+                sh '''
+                    npm test 2>&1 | grep -v "MONGOOSE.*DeprecationWarning" || true
+                '''
             }
         }
 

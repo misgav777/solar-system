@@ -130,7 +130,7 @@ pipeline {
                                 -e MONGO_URI=${MONGO_URI} \
                                 -e MONGO_USERNAME=${MONGO_USERNAME} \
                                 -e MONGO_PASSWORD=${MONGO_PASSWORD} \
-                                -p 3000:3000 -d ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:{GIT_COMMIT}
+                                -p 3000:3000 -d ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${GIT_COMMIT}
                             "
                         '''
                     }

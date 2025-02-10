@@ -203,10 +203,10 @@ pipeline {
                 ])
 
                 // Clean up Docker images
-                sh """
-                    docker rmi ${FULL_IMAGE_NAME}:${GIT_COMMIT} || true
-                    docker system prune -f || true
-                """
+                // sh """
+                //     docker rmi ${FULL_IMAGE_NAME}:${GIT_COMMIT} || true
+                //     docker system prune -f || true
+                // """
                 
                 // Clean workspace
                 cleanWs()

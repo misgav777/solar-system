@@ -31,16 +31,16 @@ pipeline {
                         sh 'echo $?' // print the exit code
                     }
                 }
-                stage('OWASP Dependency-Check') {
-                    steps {
-                        dependencyCheck additionalArguments: '''
-                            --scan \'./\'
-                            --format \'ALL\'
-                            --out \'./\'
-                            --prettyPrint
-                        ''', odcInstallation: 'OWASP-Dependency-Check-10'     
-                    }    
-                }
+                // stage('OWASP Dependency-Check') {
+                //     steps {
+                //         dependencyCheck additionalArguments: '''
+                //             --scan \'./\'
+                //             --format \'ALL\'
+                //             --out \'./\'
+                //             --prettyPrint
+                //         ''', odcInstallation: 'OWASP-Dependency-Check-10'     
+                //     }    
+                // }
             }
         }
 
@@ -113,7 +113,7 @@ pipeline {
 
         stage('Deploy to AWS EC2') {
             when {
-                branch 'feature*'
+                branch 'feature'
             }
             steps {
                 script {

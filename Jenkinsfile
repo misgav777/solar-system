@@ -72,10 +72,10 @@ pipeline {
             steps {
                 script {
                     // Scan for LOW, MEDIUM, HIGH vulnerabilities
-                    sh 'trivy image solar:${GIT_COMMIT} --severity LOW,MEDIUM,HIGH --exit-code 0 --quiet --format json -o trivy-MEDIUM-report.json'
+                    sh 'trivy image ${FULL_IMAGE_NAME}:${GIT_COMMIT} --severity LOW,MEDIUM,HIGH --exit-code 0 --quiet --format json -o trivy-MEDIUM-report.json'
                     
                     // Scan for CRITICAL vulnerabilities
-                    sh 'trivy image solar:${GIT_COMMIT} --severity CRITICAL --exit-code 1 --quiet --format json -o trivy-CRITICAL-report.json'
+                    sh 'trivy image ${FULL_IMAGE_NAME}:${GIT_COMMIT} --severity CRITICAL --exit-code 1 --quiet --format json -o trivy-CRITICAL-report.json'
                 }
             }
             post {

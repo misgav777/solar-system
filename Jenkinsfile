@@ -127,7 +127,7 @@ pipeline {
                                 -e MONGO_URI=${MONGO_URI} \
                                 -e MONGO_USERNAME=${MONGO_USERNAME} \
                                 -e MONGO_PASSWORD=${MONGO_PASSWORD} \
-                                -p 80:3000 -d ${FULL_IMAGE_NAME}:${GIT_COMMIT}
+                                -p 3000:3000 -d ${FULL_IMAGE_NAME}:${GIT_COMMIT}
                         '''
                     }
                 }
@@ -203,10 +203,10 @@ pipeline {
                 ])
 
                 // Clean up Docker images
-                // sh """
-                //     docker rmi ${FULL_IMAGE_NAME}:${GIT_COMMIT} || true
-                //     docker system prune -f || true
-                // """
+                sh """
+                    docker rmi ${FULL_IMAGE_NAME}:${GIT_COMMIT} || true
+                    docker system prune -f || true
+                """
                 
                 // Clean workspace
                 cleanWs()

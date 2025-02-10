@@ -7,6 +7,10 @@ pipeline {
         MONGO_URI = "mongodb+srv://supercluster.d83jj.mongodb.net/superData"
         MONGO_USERNAME = credentials('mongodb-user')
         MONGO_PASSWORD = credentials('mongodb-password')
+        AWS_ACCOUNT_ID = credentials('aws-account-id')
+        AWS_REGION = 'ap-south-1'
+        ECR_REPO = 'solar-system'
+        FULL_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}"
     }
     stages {
         stage('installing dependencies') {
@@ -84,6 +88,16 @@ pipeline {
                             --output trivy-CRITICAL-report.xml trivy-CRITICAL-report.json
                     '''
                 }
+            }
+        }
+
+        stage('Push docker image to ECR') {
+            steps {
+                sh '''
+                    echo $AWS_ECR_CREDENTIALS | docker login -u AWS --password-stdin ${AWS_ACCOUNT_ID}dkr.ecr.${AWS_REGION}.amazonaws.com
+                    docker tag solar:${GIT_COMMIT} ${FULL_IMAGE_NAME}:${GIT_COMMIT}
+                    docker push ${FULL_IMAGE_NAME}:${GIT_COMMIT}
+                '''
             }
         }
     }

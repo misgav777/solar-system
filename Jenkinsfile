@@ -27,22 +27,29 @@ pipeline {
                         sh 'echo $?' // print the exit code
                     }
                 }
-                // stage('OWASP Dependency-Check') {
-                //     steps {
-                //         dependencyCheck additionalArguments: '''
-                //             --scan \'./\'
-                //             --format \'ALL\'
-                //             --out \'./\'
-                //             --prettyPrint
-                //         ''', odcInstallation: 'OWASP-Dependency-Check-10'     
-                //     }    
-                // }
+                stage('OWASP Dependency-Check') {
+                    steps {
+                        dependencyCheck additionalArguments: '''
+                            --scan \'./\'
+                            --format \'ALL\'
+                            --out \'./\'
+                            --prettyPrint
+                        ''', odcInstallation: 'OWASP-Dependency-Check-10'     
+                    }    
+                }
             }
         }
 
         stage('Unit Test') {
             steps {
-                sh 'npm test'
+                script {
+                    try {
+                        sh 'npm test'
+                    } catch (err) {
+                        junit testResults: 'test-results.xml'
+                        throw err
+                    }
+                }
             }
         }
 
@@ -94,7 +101,7 @@ pipeline {
         stage('Push docker image to ECR') {
             steps {
                 sh '''
-                    echo $AWS_ECR_CREDENTIALS | docker login -u AWS --password-stdin ${AWS_ACCOUNT_ID}dkr.ecr.${AWS_REGION}.amazonaws.com
+                    docker login -u AWS --password-stdin ${AWS_ACCOUNT_ID}dkr.ecr.${AWS_REGION}.amazonaws.com
                     docker tag solar:${GIT_COMMIT} ${FULL_IMAGE_NAME}:${GIT_COMMIT}
                     docker push ${FULL_IMAGE_NAME}:${GIT_COMMIT}
                 '''
@@ -119,6 +126,16 @@ pipeline {
             publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './', reportFiles: 'trivy-MEDIUM-report.html', reportName: 'Trivy image Medium Vul Report', reportTitles: ''])
 
             publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './', reportFiles: 'trivy-CRITICAL-report.html', reportName: 'Trivy image Critical Vul Report', reportTitles: ''])
+
+            // Clean up Docker images
+            sh '''
+                docker rmi solar:${GIT_COMMIT} || true
+                docker rmi ${FULL_IMAGE_NAME}:${GIT_COMMIT} || true
+                docker system prune -f || true
+            '''
+            
+            // Clean workspace
+            cleanWs()
         }
     }
 }

@@ -112,10 +112,10 @@ pipeline {
         }
 
         stage('Deploy to AWS EC2') {
+            when {
+                branch 'feature*'
+            }
             steps {
-                when {
-                    branch 'main'
-                }
                 script {
                     // Deploy to AWS EC2
                     sshagent(['private-key-aws']) {

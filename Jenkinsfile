@@ -110,31 +110,70 @@ pipeline {
 
     post {
         always {
-            // junit allowEmptyResults: true, keepProperties: true, stdioRetention: '', testResults: 'dependency-check-junit.xml'
+            script {
+                // Archive test results with skipPublishingChecks
+                junit(
+                    allowEmptyResults: true,
+                    keepProperties: true,
+                    skipPublishingChecks: true,
+                    testResults: 'dependency-check-junit.xml'
+                )
 
-            // publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'Dependency HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                junit(
+                    allowEmptyResults: true,
+                    keepProperties: true,
+                    skipPublishingChecks: true,
+                    testResults: 'test-results.xml'
+                )
 
-            junit allowEmptyResults: true, keepProperties: true, stdioRetention: '', testResults: 'test-results.xml'
+                junit(
+                    allowEmptyResults: true,
+                    keepProperties: true,
+                    skipPublishingChecks: true,
+                    testResults: 'trivy-*-report.xml'
+                )
 
-            junit allowEmptyResults: true, keepProperties: true, stdioRetention: '', testResults: 'trivy-MEDIUM-report.xml'
-            
-            junit allowEmptyResults: true, keepProperties: true, stdioRetention: '', testResults: 'trivy-CRITICAL-report.xml'
+                // Publish HTML reports
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: './',
+                    reportFiles: 'dependency-check-jenkins.html',
+                    reportName: 'Dependency HTML Report',
+                    reportTitles: '',
+                    useWrapperFileDirectly: true
+                ])
+                
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'coverage/lcov-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Code Coverage Report',
+                    reportTitles: ''
+                ])
 
-            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'coverage/lcov-report', reportFiles: 'index.html', reportName: 'Code Coverage Report', reportTitles: ''])
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: './',
+                    reportFiles: 'trivy-*-report.html',
+                    reportName: 'Trivy Vulnerability Reports',
+                    reportTitles: ''
+                ])
 
-            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './', reportFiles: 'trivy-MEDIUM-report.html', reportName: 'Trivy image Medium Vul Report', reportTitles: ''])
-
-            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: './', reportFiles: 'trivy-CRITICAL-report.html', reportName: 'Trivy image Critical Vul Report', reportTitles: ''])
-
-            // Clean up Docker images
-            sh '''
-                docker rmi solar:${GIT_COMMIT} || true
-                docker rmi ${FULL_IMAGE_NAME}:${GIT_COMMIT} || true
-                docker system prune -f || true
-            '''
-            
-            // Clean workspace
-            cleanWs()
+                // Clean up Docker images
+                sh """
+                    docker rmi ${FULL_IMAGE_NAME}:${GIT_COMMIT} || true
+                    docker system prune -f || true
+                """
+                
+                // Clean workspace
+                cleanWs()
+            }
         }
     }
 }

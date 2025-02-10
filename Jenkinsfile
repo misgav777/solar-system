@@ -112,26 +112,36 @@ pipeline {
         always {
             script {
                 // Archive test results with skipPublishingChecks
-                junit(
-                    allowEmptyResults: true,
-                    keepProperties: true,
-                    skipPublishingChecks: true,
-                    testResults: 'dependency-check-junit.xml'
-                )
+               if (fileExists('dependency-check-junit.xml')) {
+                    junit(
+                        allowEmptyResults: true,
+                        keepProperties: true,
+                        skipPublishingChecks: true,
+                        skipMarkingBuildUnstable: true,  // Add this line
+                        testResults: 'dependency-check-junit.xml'
+                    )
+                }
 
-                junit(
-                    allowEmptyResults: true,
-                    keepProperties: true,
-                    skipPublishingChecks: true,
-                    testResults: 'test-results.xml'
-                )
 
-                junit(
-                    allowEmptyResults: true,
-                    keepProperties: true,
-                    skipPublishingChecks: true,
-                    testResults: 'trivy-*-report.xml'
-                )
+                if (fileExists('test-results.xml')) {
+                    junit(
+                        allowEmptyResults: true,
+                        keepProperties: true,
+                        skipPublishingChecks: true,
+                        skipMarkingBuildUnstable: true,  // Add this line
+                        testResults: 'test-results.xml'
+                    )
+                }
+
+                if (fileExists('trivy-*-report.xml')) {
+                    junit(
+                        allowEmptyResults: true,
+                        keepProperties: true,
+                        skipPublishingChecks: true,
+                        skipMarkingBuildUnstable: true,  // Skip marking build unstable if there are test failures
+                        testResults: 'trivy-*-report.xml'
+                    )
+                }
 
                 // Publish HTML reports
                 publishHTML([

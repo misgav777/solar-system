@@ -112,7 +112,7 @@ pipeline {
                     // Deploy to AWS EC2
                     sshagent(['private-key-aws']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@13.126.192.17
+                        ssh -o StrictHostKeyChecking=no ubuntu@13.126.192.17 "
                             if docker ps | grep -q ${ECR_REPO}; then
                                 echo "Container is running, stopping and removing it"
                                 docker stop ${ECR_REPO} && docker rm ${ECR_REPO}
@@ -131,6 +131,7 @@ pipeline {
                                 -e MONGO_USERNAME=${MONGO_USERNAME} \
                                 -e MONGO_PASSWORD=${MONGO_PASSWORD} \
                                 -p 3000:3000 -d ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:{GIT_COMMIT}
+                            "
                         '''
                     }
                 }

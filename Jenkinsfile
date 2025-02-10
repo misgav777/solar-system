@@ -46,7 +46,14 @@ pipeline {
 
         stage('Unit Test') {
             steps {
-                sh 'npm run test'
+                script {
+                    try {
+                        sh 'npm test'
+                    } catch (err) {
+                        junit testResults: 'test-results.xml'
+                        throw err
+                    }
+                }
             }
         }
 
@@ -116,13 +123,11 @@ pipeline {
                                 docker stop ${ECR_REPO} && docker rm ${ECR_REPO}
                                 echo "Container stopped and removed"
                         fi
-                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                            docker pull ${FULL_IMAGE_NAME}:${GIT_COMMIT}
                             docker run --name ${ECR_REPO} \
                                 -e MONGO_URI=${MONGO_URI} \
                                 -e MONGO_USERNAME=${MONGO_USERNAME} \
                                 -e MONGO_PASSWORD=${MONGO_PASSWORD} \
-                                -p 3000:3000 -d ${FULL_IMAGE_NAME}:${GIT_COMMIT}
+                                -p 80:3000 -d ${FULL_IMAGE_NAME}:${GIT_COMMIT}
                         '''
                     }
                 }

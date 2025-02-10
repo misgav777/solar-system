@@ -112,9 +112,6 @@ pipeline {
         }
 
         stage('Deploy to AWS EC2') {
-            when {
-                branch 'feature'
-            }
             steps {
                 script {
                     // Deploy to AWS EC2

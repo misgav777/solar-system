@@ -11,6 +11,10 @@ pipeline {
         AWS_REGION = 'ap-south-1'
         ECR_REPO = 'solar-system'
         FULL_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}"
+        // GIT_COMMIT_SHORT = "${sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()}"
+        // VERSION = sh(script: """
+        //     git describe --tags --abbrev=0 2>/dev/null || echo '1.0.0'
+        // """, returnStdout: true).trim()
     }
     stages {
         stage('installing dependencies') {
@@ -104,6 +108,32 @@ pipeline {
                 aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                 docker push ${FULL_IMAGE_NAME}:${GIT_COMMIT}
                 '''
+            }
+        }
+
+        stage('Deploy to AWS EC2') {
+            steps {
+                when {
+                    branch 'main'
+                }
+                script {
+                    // Deploy to AWS EC2
+                    sshagent(['private-key-aws']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@13.126.192.17
+                            if sudo docker ps | grep -q ${ECR_REPO}; then
+                                echo "Container is running, stopping and removing it"
+                                sudo docker stop ${ECR_REPO} && sudo docker rm ${ECR_REPO}
+                                echo "Container stopped and removed"
+                        fi
+                            sudo docker run --name ${ECR_REPO} \
+                                -e MONGO_URI=${MONGO_URI} \
+                                -e MONGO_USERNAME=${MONGO_USERNAME} \
+                                -e MONGO_PASSWORD=${MONGO_PASSWORD} \
+                                -p 80:3000 -d ${FULL_IMAGE_NAME}:${GIT_COMMIT}
+                        '''
+                    }
+                }
             }
         }
     }

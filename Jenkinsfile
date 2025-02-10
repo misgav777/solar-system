@@ -123,7 +123,7 @@ pipeline {
                             
                             # Pull the latest image
                             echo "Pulling latest image from ECR"
-                            docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:{GIT_COMMIT}
+                            docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}:${GIT_COMMIT}
                             
                             # Run the new container
                             docker run --name ${ECR_REPO} \

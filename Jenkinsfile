@@ -34,7 +34,7 @@ pipeline {
                             --format \'ALL\'
                             --out \'./\'
                             --prettyPrint
-                        ''', odcInstallation: 'OWASP-Dependency-Check-10'     
+                        ''', odcInstallation: 'OWASP-Dependency-Check-12'     
                     }    
                 }
             }

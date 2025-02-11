@@ -11,10 +11,6 @@ pipeline {
         AWS_REGION = 'ap-south-1'
         ECR_REPO = 'solar-system'
         FULL_IMAGE_NAME = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}"
-        // GIT_COMMIT_SHORT = "${sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()}"
-        // VERSION = sh(script: """
-        //     git describe --tags --abbrev=0 2>/dev/null || echo '1.0.0'
-        // """, returnStdout: true).trim()
     }
     stages {
         stage('installing dependencies') {
@@ -31,16 +27,16 @@ pipeline {
                         sh 'echo $?' // print the exit code
                     }
                 }
-                // stage('OWASP Dependency-Check') {
-                //     steps {
-                //         dependencyCheck additionalArguments: '''
-                //             --scan \'./\'
-                //             --format \'ALL\'
-                //             --out \'./\'
-                //             --prettyPrint
-                //         ''', odcInstallation: 'OWASP-Dependency-Check-10'     
-                //     }    
-                // }
+                stage('OWASP Dependency-Check') {
+                    steps {
+                        dependencyCheck additionalArguments: '''
+                            --scan \'./\'
+                            --format \'ALL\'
+                            --out \'./\'
+                            --prettyPrint
+                        ''', odcInstallation: 'OWASP-Dependency-Check-10'     
+                    }    
+                }
             }
         }
 

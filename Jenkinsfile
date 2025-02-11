@@ -27,16 +27,16 @@ pipeline {
                         sh 'echo $?' // print the exit code
                     }
                 }
-                // stage('OWASP Dependency-Check') {
-                //     steps {
-                //         dependencyCheck additionalArguments: '''
-                //             --scan \'./\'
-                //             --format \'ALL\'
-                //             --out \'./\'
-                //             --prettyPrint
-                //         ''', odcInstallation: 'OWASP-Dependency-Check-10'     
-                //     }    
-                // }
+                stage('OWASP Dependency-Check') {
+                    steps {
+                        dependencyCheck additionalArguments: '''
+                            --scan \'./\'
+                            --format \'ALL\'
+                            --out \'./\'
+                            --prettyPrint
+                        ''', odcInstallation: 'OWASP-Dependency-Check-10'     
+                    }    
+                }
             }
         }
 
@@ -135,83 +135,83 @@ pipeline {
         }
     }
 
-    // post {
-    //     always {
-    //         script {
-    //             // Archive test results with skipPublishingChecks
-    //            if (fileExists('dependency-check-junit.xml')) {
-    //                 junit(
-    //                     allowEmptyResults: true,
-    //                     keepProperties: true,
-    //                     skipPublishingChecks: true,
-    //                     skipMarkingBuildUnstable: true,  // Add this line
-    //                     testResults: 'dependency-check-junit.xml'
-    //                 )
-    //             }
+    post {
+        always {
+            script {
+                // Archive test results with skipPublishingChecks
+               if (fileExists('dependency-check-junit.xml')) {
+                    junit(
+                        allowEmptyResults: true,
+                        keepProperties: true,
+                        skipPublishingChecks: true,
+                        skipMarkingBuildUnstable: true,  // Add this line
+                        testResults: 'dependency-check-junit.xml'
+                    )
+                }
 
 
-    //             if (fileExists('test-results.xml')) {
-    //                 junit(
-    //                     allowEmptyResults: true,
-    //                     keepProperties: true,
-    //                     skipPublishingChecks: true,
-    //                     skipMarkingBuildUnstable: true,  // Add this line
-    //                     testResults: 'test-results.xml'
-    //                 )
-    //             }
+                if (fileExists('test-results.xml')) {
+                    junit(
+                        allowEmptyResults: true,
+                        keepProperties: true,
+                        skipPublishingChecks: true,
+                        skipMarkingBuildUnstable: true,  // Add this line
+                        testResults: 'test-results.xml'
+                    )
+                }
 
-    //             if (fileExists('trivy-*-report.xml')) {
-    //                 junit(
-    //                     allowEmptyResults: true,
-    //                     keepProperties: true,
-    //                     skipPublishingChecks: true,
-    //                     skipMarkingBuildUnstable: true,  // Skip marking build unstable if there are test failures
-    //                     testResults: 'trivy-*-report.xml'
-    //                 )
-    //             }
+                if (fileExists('trivy-*-report.xml')) {
+                    junit(
+                        allowEmptyResults: true,
+                        keepProperties: true,
+                        skipPublishingChecks: true,
+                        skipMarkingBuildUnstable: true,  // Skip marking build unstable if there are test failures
+                        testResults: 'trivy-*-report.xml'
+                    )
+                }
 
-    //             // Publish HTML reports
-    //             publishHTML([
-    //                 allowMissing: true,
-    //                 alwaysLinkToLastBuild: true,
-    //                 keepAll: true,
-    //                 reportDir: './',
-    //                 reportFiles: 'dependency-check-jenkins.html',
-    //                 reportName: 'Dependency HTML Report',
-    //                 reportTitles: '',
-    //                 useWrapperFileDirectly: true
-    //             ])
+                // Publish HTML reports
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: './',
+                    reportFiles: 'dependency-check-jenkins.html',
+                    reportName: 'Dependency HTML Report',
+                    reportTitles: '',
+                    useWrapperFileDirectly: true
+                ])
                 
-    //             publishHTML([
-    //                 allowMissing: true,
-    //                 alwaysLinkToLastBuild: true,
-    //                 keepAll: true,
-    //                 reportDir: 'coverage/lcov-report',
-    //                 reportFiles: 'index.html',
-    //                 reportName: 'Code Coverage Report',
-    //                 reportTitles: ''
-    //             ])
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'coverage/lcov-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Code Coverage Report',
+                    reportTitles: ''
+                ])
 
-    //             publishHTML([
-    //                 allowMissing: true,
-    //                 alwaysLinkToLastBuild: true,
-    //                 keepAll: true,
-    //                 reportDir: './',
-    //                 reportFiles: 'trivy-*-report.html',
-    //                 reportName: 'Trivy Vulnerability Reports',
-    //                 reportTitles: ''
-    //             ])
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: './',
+                    reportFiles: 'trivy-*-report.html',
+                    reportName: 'Trivy Vulnerability Reports',
+                    reportTitles: ''
+                ])
 
-    //             // Clean up Docker images
-    //             sh """
-    //                 docker rmi ${FULL_IMAGE_NAME}:${GIT_COMMIT} || true
-    //                 docker system prune -f || true
-    //             """
+                // Clean up Docker images
+                sh """
+                    docker rmi ${FULL_IMAGE_NAME}:${GIT_COMMIT} || true
+                    docker system prune -f || true
+                """
                 
-    //             // Clean workspace
-    //             cleanWs()
-    //         }
-    //     }
-    // }
+                // Clean workspace
+                cleanWs()
+            }
+        }
+    }
 }
   

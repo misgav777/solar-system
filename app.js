@@ -48,7 +48,7 @@ var dataSchema = new Schema({
 });
 var planetModel = mongoose.model('planets', dataSchema);
 
-
+mongoose.set('strictQuery', false)
 
 app.post('/planet',   function(req, res) {
    // console.log("Received Planet ID " + req.body.id)

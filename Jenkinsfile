@@ -16,6 +16,7 @@ pipeline {
         stage('installing dependencies') {
             steps {
                 sh 'npm install --no-audit'
+                sh 'echo "hello world"'
             }
         }
 
